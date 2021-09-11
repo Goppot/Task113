@@ -6,22 +6,18 @@ import org.hibernate.Session;
 import org.hibernate.SessionFactory;
 import org.hibernate.Transaction;
 import org.hibernate.query.Query;
-
-import java.sql.SQLException;
 import java.util.List;
 
 public class UserDaoHibernateImpl implements UserDao {
 
-    Transaction transaction = null;
+    SessionFactory sessionFactory = UtilHibernate.getInstance().getSessionFactory();
 
     public UserDaoHibernateImpl() {
     }
     @Override
     public void createUsersTable() {
-
-        try (SessionFactory sessionFactory = UtilHibernate.getInstance().getSessionFactory();
-             Session session = sessionFactory.openSession()){
-            transaction = session.beginTransaction();
+        try (Session session = sessionFactory.openSession()){
+            Transaction transaction = session.beginTransaction();
             String sql = "CREATE TABLE IF NOT EXISTS user " +
                     "(id INT NOT NULL AUTO_INCREMENT," +
                     " name VARCHAR(50)," +
@@ -33,14 +29,16 @@ public class UserDaoHibernateImpl implements UserDao {
             transaction.commit();
         } catch (Exception e){
             System.out.println("Problem Transaction Create Table");
+            e.printStackTrace();
+        }finally {
+            sessionFactory.close();
         }
     }
 
     @Override
     public void dropUsersTable() {
-
-        try (SessionFactory sessionFactory = UtilHibernate.getInstance().getSessionFactory();
-             Session session = sessionFactory.openSession()){
+        Transaction transaction = null;
+        try (Session session = sessionFactory.openSession()){
             transaction = session.beginTransaction();
             String sql = "drop table if exists user";
             Query query = session.createSQLQuery(sql);
@@ -49,12 +47,14 @@ public class UserDaoHibernateImpl implements UserDao {
         } catch (Exception e){
             System.out.println("Problem Transaction Drop Table");
             transaction.rollback();
+        } finally {
+            sessionFactory.close();
         }
     }
 
     @Override
     public void saveUser(String name, String lastName, byte age) {
-
+        Transaction transaction = null;
         try (SessionFactory sessionFactory = UtilHibernate.getInstance().getSessionFactory();
              Session session = sessionFactory.openSession()){
             transaction = session.beginTransaction();
@@ -67,12 +67,14 @@ public class UserDaoHibernateImpl implements UserDao {
         } catch (Exception e){
             transaction.rollback();
             System.out.println("RollBack Transaction Save");
+        } finally {
+            sessionFactory.close();
         }
     }
 
     @Override
     public void removeUserById(long id) {
-
+        Transaction transaction = null;
         try (SessionFactory sessionFactory = UtilHibernate.getInstance().getSessionFactory();
              Session session = sessionFactory.openSession()){
             transaction = session.beginTransaction();
@@ -84,12 +86,14 @@ public class UserDaoHibernateImpl implements UserDao {
         } catch (Exception e){
             transaction.rollback();
             System.out.println("RollBack Transaction Remove");
+        } finally {
+            sessionFactory.close();
         }
     }
 
     @Override
     public List<User> getAllUsers() {
-
+        Transaction transaction = null;
         try (SessionFactory sessionFactory = UtilHibernate.getInstance().getSessionFactory();
              Session session = sessionFactory.openSession()){
             transaction = session.beginTransaction();
@@ -100,13 +104,15 @@ public class UserDaoHibernateImpl implements UserDao {
             return userList;
         } catch (Exception e){
             System.out.println("Problem Transaction AllUsers");
+        } finally {
+            sessionFactory.close();
         }
         return null;
     }
 
     @Override
     public void cleanUsersTable() {
-
+        Transaction transaction = null;
         try (SessionFactory sessionFactory = UtilHibernate.getInstance().getSessionFactory();
              Session session = sessionFactory.openSession()){
             transaction = session.beginTransaction();
@@ -117,6 +123,8 @@ public class UserDaoHibernateImpl implements UserDao {
         } catch (Exception e){
             transaction.rollback();
             System.out.println("RollBack Transaction Clean Table");
+        } finally {
+            sessionFactory.close();
         }
     }
 }
