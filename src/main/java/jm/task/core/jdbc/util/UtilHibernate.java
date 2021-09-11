@@ -5,6 +5,8 @@ import org.hibernate.SessionFactory;
 import org.hibernate.cfg.Configuration;
 import org.hibernate.cfg.Environment;
 
+import javax.persistence.EntityManagerFactory;
+import javax.persistence.Persistence;
 import java.util.Properties;
 
 public class UtilHibernate {
@@ -54,6 +56,9 @@ public class UtilHibernate {
         }
         return sessionFactory;
     }
+
+
+
 
 }
 
