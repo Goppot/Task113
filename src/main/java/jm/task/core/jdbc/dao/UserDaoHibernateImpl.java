@@ -30,8 +30,6 @@ public class UserDaoHibernateImpl implements UserDao {
         } catch (Exception e){
             System.out.println("Problem Transaction Create Table");
             e.printStackTrace();
-        }finally {
-            sessionFactory.close();
         }
     }
 
@@ -47,16 +45,14 @@ public class UserDaoHibernateImpl implements UserDao {
         } catch (Exception e){
             System.out.println("Problem Transaction Drop Table");
             transaction.rollback();
-        } finally {
-            sessionFactory.close();
+            e.printStackTrace();
         }
     }
 
     @Override
     public void saveUser(String name, String lastName, byte age) {
         Transaction transaction = null;
-        try (SessionFactory sessionFactory = UtilHibernate.getInstance().getSessionFactory();
-             Session session = sessionFactory.openSession()){
+        try (Session session = sessionFactory.openSession()){
             transaction = session.beginTransaction();
             String sql = "insert into user(name, lastName, age) values ('"
                     + name + "','" + lastName + "','" + age + "')";
@@ -67,16 +63,14 @@ public class UserDaoHibernateImpl implements UserDao {
         } catch (Exception e){
             transaction.rollback();
             System.out.println("RollBack Transaction Save");
-        } finally {
-            sessionFactory.close();
+            e.printStackTrace();
         }
     }
 
     @Override
     public void removeUserById(long id) {
         Transaction transaction = null;
-        try (SessionFactory sessionFactory = UtilHibernate.getInstance().getSessionFactory();
-             Session session = sessionFactory.openSession()){
+        try (Session session = sessionFactory.openSession()){
             transaction = session.beginTransaction();
             String sql = "delete from user where id=?";
             Query query = session.createSQLQuery(sql);
@@ -86,16 +80,14 @@ public class UserDaoHibernateImpl implements UserDao {
         } catch (Exception e){
             transaction.rollback();
             System.out.println("RollBack Transaction Remove");
-        } finally {
-            sessionFactory.close();
+            e.printStackTrace();
         }
     }
 
     @Override
     public List<User> getAllUsers() {
         Transaction transaction = null;
-        try (SessionFactory sessionFactory = UtilHibernate.getInstance().getSessionFactory();
-             Session session = sessionFactory.openSession()){
+        try (Session session = sessionFactory.openSession()){
             transaction = session.beginTransaction();
             String sql = "select * from user";
             Query query = session.createSQLQuery(sql).addEntity(User.class);
@@ -104,8 +96,7 @@ public class UserDaoHibernateImpl implements UserDao {
             return userList;
         } catch (Exception e){
             System.out.println("Problem Transaction AllUsers");
-        } finally {
-            sessionFactory.close();
+            e.printStackTrace();
         }
         return null;
     }
@@ -113,8 +104,7 @@ public class UserDaoHibernateImpl implements UserDao {
     @Override
     public void cleanUsersTable() {
         Transaction transaction = null;
-        try (SessionFactory sessionFactory = UtilHibernate.getInstance().getSessionFactory();
-             Session session = sessionFactory.openSession()){
+        try (Session session = sessionFactory.openSession()){
             transaction = session.beginTransaction();
             String sql = "truncate table user";
             Query query = session.createSQLQuery(sql);
@@ -123,8 +113,7 @@ public class UserDaoHibernateImpl implements UserDao {
         } catch (Exception e){
             transaction.rollback();
             System.out.println("RollBack Transaction Clean Table");
-        } finally {
-            sessionFactory.close();
+            e.printStackTrace();
         }
     }
 }
